@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import cheerio from 'cheerio';
 
@@ -8,16 +8,13 @@ interface Anime {
   img: string;
 }
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const categoriesParam = searchParams.get('categories');
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const categoriesParam = searchParams.get('categories') || 'allmecha'; // Default category if none is selected
   const page = parseInt(searchParams.get('page') || '1', 10);
   const limit = parseInt(searchParams.get('limit') || '10', 10);
+  const searchTerm = searchParams.get('searchTerm') || ''; // Get search term
   const offset = (page - 1) * limit;
-
-  if (!categoriesParam) {
-    return NextResponse.json({ error: 'Categories are required' }, { status: 400 });
-  }
 
   const categories = categoriesParam.split(',').map(cat => `/${cat.replace(/^\/+/, '')}`);
   const allAnimes: Anime[] = [];
@@ -64,7 +61,12 @@ export async function GET(request: Request) {
     }
   }
 
-  const paginatedAnimes = allAnimes.slice(offset, offset + limit);
+  // Filter based on searchTerm
+  const filteredAnimes = allAnimes.filter(anime =>
+    anime.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const paginatedAnimes = filteredAnimes.slice(offset, offset + limit);
 
   return NextResponse.json(paginatedAnimes);
 }

@@ -1,6 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import axios from "axios";
-import cheerio from "cheerio";
+import { NextRequest, NextResponse } from 'next/server';
+import axios from 'axios';
+import cheerio from 'cheerio';
+
+interface Category {
+  title: string;
+  link: string;
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,6 +23,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(categories.slice(2));
   } catch (error) {
+    console.error('Error fetching categories:', error);
     return new NextResponse("Error fetching categories", { status: 500 });
   }
 }

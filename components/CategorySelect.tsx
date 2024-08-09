@@ -1,6 +1,12 @@
-import React from "react";
-import Select from "react-select";
-import { motion } from "framer-motion";
+import React from 'react';
+import Select from 'react-select';
+import { motion } from 'framer-motion';
+
+// Define Category type for react-select
+interface Category {
+  value: string;
+  label: string;
+}
 
 interface CategorySelectProps {
   categories: Category[];
@@ -16,12 +22,16 @@ const CategorySelect: React.FC<CategorySelectProps> = ({ categories, onChange })
       transition={{ duration: 0.5 }}
     >
       <Select
+        instanceId="category-select"
         isMulti
         options={categories}
         className="basic-multi-select"
         classNamePrefix="select"
         placeholder="Select categories"
-        onChange={selectedOptions => onChange(selectedOptions as Category[])}
+        onChange={(selectedOptions) => {
+          // Ensure selectedOptions is not undefined and cast it to Category[]
+          onChange(selectedOptions ? (selectedOptions as Category[]) : []);
+        }}
       />
     </motion.div>
   );
